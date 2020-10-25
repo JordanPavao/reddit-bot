@@ -1,4 +1,5 @@
-const { Client, MessageEmbed } = require('discord.js');
+const { info } = require('console');
+const { Client, MessageEmbed, Channel } = require('discord.js');
 const fetch = require('node-fetch');
 const { prefix, token } = require('./config.json');
 
@@ -33,28 +34,40 @@ client.on('message', async message => {
     } else {
         count = 0;
         subreddit = command;
-        getAPI();
+        let info;
+
+        // Function call to get information from embed
+        getAPI().then(function(data) {
+            info = data;
+            message.channel.send(info);
+        });
     }
 });
 
 // Calls Api with user requested subreddit
 function getAPI() {
-
-    fetch(`${api_path}${subreddit}${api_key}`).then(function(response) {
+    return fetch(`${api_path}${subreddit}${api_key}`).then(function(response) {
         if(response.ok) {
-            console.log("made it");
             return response.json();
         } else {
             throw new Error('Error');
         }
     }).then(function(json) {
-
-        embedData(json);
+        return embedData(json);
         /*for (let i = 0; i < json.data.children.length; i++) {
             console.log('https://www.reddit.com'+json.data.children[i].data.permalink);
-        }*/
-       
+        */
     });
+}
+
+// Function returns embedded message with requested subreddit's data
+function embedData(json) {
+    let subredditInfo = new MessageEmbed()
+        .setColor('#0099ff')
+        .setDescription('test')
+        .addFields({ name: 'black', value: 'test'})
+
+    return subredditInfo;
 }
 
 client.login(token);
