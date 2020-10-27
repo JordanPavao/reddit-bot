@@ -39,6 +39,7 @@ client.on('message', async message => {
     // Command 'n' represents a request to display the next entry
     } else if(command === 'n') {
         if(subreddit === "") {
+            console.log(`count${count}`);
             message.channel.send("Please enter a valid subreddit before requesting new subreddit entries");
             return;
         }
@@ -97,10 +98,15 @@ function getAPI(index) {
         }
         catch(err) {
             console.log(err)
+            
+            if(index === 0) {
+                // Setting subreddit = "" ensures that previous/next functions is not used on invalid subreddit
+                subreddit = "";
+                return('Subreddit is private / does not exist\nPlease enter a new subreddit!');
+            } else {
+                return('You have hit the max number of entries that this subreddit can display\nView previous entries or Enter a new Subreddit!');
+            }
 
-            // Setting subreddit = "" ensures that previous functions is not used on invalid subreddit
-            subreddit = "";
-            return('Subreddit is private / does not exist, Please enter a new subreddit!');
         }
     });
 }
