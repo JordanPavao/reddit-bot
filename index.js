@@ -13,6 +13,7 @@ const api_key = "/.json";
 // Count Variable
 let count = 0;
 
+
 client.once('ready', () => {
     console.log('Ready!')
 })
@@ -26,18 +27,35 @@ client.on('message', async message => {
     if(command === 'help') {
         //do something
     } else if(command === 'n') {
+        let info;
+
         count++;
+
+        getAPI(count).then(function(data) {
+            info = data;
+            message.channel.send(info);
+        });
+
         console.log(count)
         //go next
     } else if(command === 'prev') {
-        //go prev
-    } else {
-        count = 0;
-        subreddit = command;
         let info;
 
+        count--;
+        //console.log(count)
+
+        getAPI(count).then(function(data) {
+            info = data;
+            message.channel.send(info);
+        });
+    } else {
+        let info;
+
+        count = 0;
+        subreddit = command;
+
         // Function call to get information from embed
-        getAPI().then(function(data) {
+        getAPI(count).then(function(data) {
             info = data;
             message.channel.send(info);
         });
@@ -45,12 +63,12 @@ client.on('message', async message => {
 });
 
 // Calls Api with user requested subreddit
-function getAPI() {
+function getAPI(index) {
     return fetch(`${api_path}${subreddit}${api_key}`).then(function(response) {
         return response.json();
     }).then(function(json) {
         try {
-            return embedData(json, 0);
+            return embedData(json, index);
         }
         catch(err) {
             console.log(err)
