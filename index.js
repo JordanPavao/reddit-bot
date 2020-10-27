@@ -1,4 +1,3 @@
-const { info } = require('console');
 const { Client, MessageEmbed, Channel } = require('discord.js');
 const fetch = require('node-fetch');
 const { prefix, token } = require('./config.json');
@@ -27,12 +26,23 @@ client.on('message', async message => {
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if(command === 'help') {
+    // Ensures that there is no empty input
+    if(command === "") {
+        message.channel.send("Please enter a valid subreddit");
+        return;
+    }
+
+    // Command 'h' represents a request to display the help menu
+    if(command === 'h') {
         //do something
 
     // Command 'n' represents a request to display the next entry
     } else if(command === 'n') {
-        
+        if(subreddit === "") {
+            message.channel.send("Please enter a valid subreddit before requesting new subreddit entries");
+            return;
+        }
+
         count++;
 
         getAPI(count).then(function(data) {
@@ -67,6 +77,7 @@ client.on('message', async message => {
     } else {
         count = 0;
         subreddit = command;
+        console.log(subreddit);
 
         // Function call to get information from embed
         getAPI(count).then(function(data) {
@@ -78,10 +89,6 @@ client.on('message', async message => {
 
 // Calls Api with user requested subreddit
 function getAPI(index) {
-    if(subreddit === "") {
-        return "Please enter a valid subreddit";
-    }
-
     return fetch(`${api_path}${subreddit}${api_key}`).then(function(response) {
         return response.json();
     }).then(function(json) {
@@ -101,14 +108,24 @@ function getAPI(index) {
 
 // Function returns embedded message with requested subreddit's data
 function embedData(json, index) {
+
     let subredditInfo = new MessageEmbed()
         .setColor('#FF2E00')
         .setAuthor(`u/${json.data.children[index].data.author}`, 'https://i.imgur.com/jZdCrpv.png')
-        .setTitle(json.data.children[index].data.title)
+        
 
         .setTimestamp()
 
         .setDescription('[Link](https://www.reddit.com' +json.data.children[index].data.permalink + ')')
+
+        // Verify that title is less than or equal to 256 characters
+        if((json.data.children[index].data.title).length > 256) {
+            let title = (json.data.children[index].data.title).slice(0,252);
+            title = title.concat('...');
+            subredditInfo.setTitle(title);
+        } else {
+            subredditInfo.setTitle(json.data.children[index].data.title);
+        }
 
         // Verify that url ends with .jpg
         if(json.data.children[index].data.url.endsWith(".jpg") || json.data.children[index].data.url.endsWith(".png")) {
