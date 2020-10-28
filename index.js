@@ -34,7 +34,20 @@ client.on('message', async message => {
 
     // Command 'h' represents a request to display the help menu
     if(command === 'h') {
-        //do something
+        let helpMenu = new MessageEmbed()
+            .setColor('#FF2E00')
+            
+            .addFields(
+                { name: 'r/**{subreddit}**', value: 'shows the first entry for the subreddit entered'},
+                { name: 'r/**h**', value: 'shows the help menu with a list of commands for the bot'},
+                { name: 'r/**n**', value: 'shows the next entry in the entered subreddit'},
+                { name: 'r/**p**', value: 'shows the previous entry in the entered subreddit'}
+            )
+            
+            .setFooter('Reddit Bot • Help Menu')
+            .setTimestamp();
+
+        message.channel.send(helpMenu);
 
     // Command 'n' represents a request to display the next entry
     } else if(command === 'n') {
