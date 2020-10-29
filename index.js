@@ -17,12 +17,12 @@ client.once('ready', () => {
 })
 
 client.on('message', async message => {
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    if (!message.content.startsWith(process.env.prefix) || message.author.bot) return;
 
     // Data Receiving Variable
     let info;
 
-	const args = message.content.slice(prefix.length).trim().split(/ +/);
+	const args = message.content.slice(process.env.prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
     // Ensures that there is no empty input
@@ -152,4 +152,4 @@ function embedData(json, index) {
     return subredditInfo;
 }
 
-client.login(token);
+client.login(process.env.token);
